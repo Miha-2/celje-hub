@@ -237,6 +237,7 @@
       user-select: none;
     }
 
+    .score-btn { transition: color 0.15s ease, transform 0.1s ease, opacity 0.3s ease; }
     .score-btn:hover { color: rgba(255,255,255,0.85); }
     .score-btn:active { transform: scale(0.88); color: #fff; }
 
@@ -735,6 +736,12 @@
       const success = document.getElementById('successState');
       success.style.display = 'flex';
       success.style.animation = 'fadeUp 0.4s ease both';
+
+      // Hide all score buttons
+      document.querySelectorAll('.score-btn').forEach(btn => {
+        btn.style.opacity = '0';
+        btn.style.pointerEvents = 'none';
+      });
     }
 
     // Shake animation
