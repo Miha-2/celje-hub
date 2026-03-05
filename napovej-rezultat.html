@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="sl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Napovej izid tekme – NK Celje</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue:        #1a2a5e;
+      --blue-mid:    #243480;
+      --blue-light:  #2e42a0;
+      --text:        #e8eeff;
+      --muted:       #8fa0cc;
+      --card-bg:     rgba(10, 16, 48, 0.75);
+      --card-border: rgba(255, 255, 255, 0.15);
+      --radius-lg:   20px;
+      --input-bg:    rgba(255,255,255,0.06);
+      --input-border:rgba(255,255,255,0.18);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Barlow', 'Helvetica Neue', sans-serif;
+      color: var(--text);
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+
+    /* BACKGROUND */
+    .bg-fixed {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(46,66,160,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(26,42,94,0.3) 0%, transparent 50%),
+        #06091f;
+      z-index: 0;
+    }
+
+    .bg-fixed::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px),
+        repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px);
+    }
+
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(160deg, rgba(4,8,30,0.5) 0%, rgba(10,16,48,0.4) 50%, rgba(4,8,30,0.6) 100%);
+      z-index: 1;
+    }
+
+    /* LAYOUT */
+    .wrap {
+      position: relative;
+      z-index: 2;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 28px 16px 48px;
+    }
+
+    /* HEADER */
+    .hub-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      animation: fadeDown 0.5s ease both;
+    }
+
+    .header-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .header-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .header-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 0.95;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: #fff;
+    }
+
+    .header-sub {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.4;
+      max-width: 280px;
+    }
+
+    /* CARD */
+    .card {
+      padding: 0;
+      animation: fadeUp 0.5s 0.1s ease both;
+      position: relative;
+    }
+
+    /* PRIZE BADGE */
+    .prize-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #c5d0f0;
+      margin-bottom: 20px;
+    }
+
+    .prize-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6ef0b0;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* MATCHUP + SCORE UNIFIED */
+    .matchup {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: stretch;
+      gap: 4px;
+      margin-bottom: 28px;
+    }
+
+    .team {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .team-logo {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+    }
+
+    .team-logo-placeholder {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .team-logo-placeholder span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: #8fa0cc;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+
+    .team-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text);
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .vs-block {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 52px;
+    }
+
+    .score-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .score-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s ease, transform 0.1s ease;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .score-btn:hover { color: rgba(255,255,255,0.85); }
+    .score-btn:active { transform: scale(0.88); color: #fff; }
+
+    .score-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .score-display {
+      width: 72px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 68px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .score-colon {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 52px;
+      font-weight: 900;
+      color: rgba(255,255,255,0.25);
+      line-height: 1;
+    }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+      margin: 0 0 22px;
+    }
+
+    /* FORM */
+    .form-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding-left: 2px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: #fff;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.18s ease, background 0.18s ease;
+      -webkit-appearance: none;
+    }
+
+    .field input::placeholder { color: rgba(255,255,255,0.25); }
+
+    .field input:focus {
+      border-color: rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.09);
+    }
+
+    /* CHECKBOXES */
+    .checkboxes {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.06);
+      cursor: pointer;
+      position: relative;
+      margin-top: 1px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .checkbox-row input[type="checkbox"]:checked {
+      background: var(--blue-mid);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    .checkbox-row input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 8px;
+      height: 12px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+
+    .checkbox-label {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .checkbox-label a {
+      color: #a8bce8;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    /* SUBMIT BUTTON */
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--blue-mid) 0%, var(--blue-light) 100%);
+      color: #fff;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s;
+      box-shadow: 0 4px 20px rgba(26,42,94,0.5);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(26,42,94,0.7);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+      opacity: 0.9;
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* SUCCESS STATE */
+    .success-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px 0 10px;
+      gap: 14px;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .success-icon svg {
+      width: 30px;
+      height: 30px;
+      stroke: #fff;
+      stroke-width: 2.5;
+      fill: none;
+    }
+
+    .success-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .success-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 280px;
+    }
+
+    /* ONCE NOTE */
+    .once-note {
+      font-size: 11.5px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 14px;
+      opacity: 0.7;
+    }
+
+    /* SPONSOR */
+    .sponsor-inline {
+      margin-top: 22px;
+      margin-bottom: 4px;
+    }
+
+    .sponsor-section {
+      margin-top: 20px;
+      animation: fadeUp 0.5s 0.3s ease both;
+    }
+
+    .sponsor-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 10px;
+      padding-left: 4px;
+      opacity: 0.7;
+    }
+
+    .sponsor-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      padding: 20px 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+
+    .sponsor-img {
+      max-width: 340px;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .sponsor-placeholder {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: #bbb;
+      text-transform: uppercase;
+    }
+
+    /* FOOTER */
+    .hub-footer {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px 10px;
+      font-size: 11.5px;
+      color: var(--muted);
+      padding-top: 20px;
+      opacity: 0.7;
+    }
+
+    .hub-footer a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .hub-footer a:hover { color: #fff; }
+    .hub-footer span { opacity: 0.5; }
+
+    /* GDPR NOTE */
+    .gdpr-note {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-top: 16px;
+      opacity: 0.6;
+    }
+
+    .gdpr-note a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 360px) {
+      .header-title { font-size: 24px; }
+      .score-display { width: 48px; height: 48px; font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-fixed"></div>
+  <div class="bg-overlay"></div>
+
+  <main class="wrap">
+
+    <!-- HEADER -->
+    <header class="hub-header">
+      <h1 class="header-title">Napovej<br>izid tekme!</h1>
+      <p class="header-sub">Oddaj svojo napoved in osvoji nagrado.</p>
+    </header>
+
+    <!-- MAIN CARD -->
+    <div class="card">
+
+      <!-- MATCHUP + SCORE UNIFIED -->
+      <div class="matchup">
+        <div class="team">
+          <img src="celje.png" alt="NK Celje" class="team-logo" />
+          <span class="team-name">NK Celje</span>
+          <div class="score-side">
+            <button class="score-btn" onclick="change('home', 1)" aria-label="Povečaj">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
+            <div class="score-display" id="homeScore">0</div>
+            <button class="score-btn" onclick="change('home', -1)" aria-label="Zmanjšaj">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="vs-block">
+          <span class="score-colon">:</span>
+        </div>
+        <div class="team">
+          <img src="aek.svg" alt="Gostje" class="team-logo" />
+          <span class="team-name">A.E.K.</span>
+          <div class="score-side">
+            <button class="score-btn" onclick="change('away', 1)" aria-label="Povečaj">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
+            <div class="score-display" id="awayScore">0</div>
+            <button class="score-btn" onclick="change('away', -1)" aria-label="Zmanjšaj">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- FORM -->
+      <div id="formContent">
+        <div class="form-fields">
+          <div class="field-row">
+            <div class="field">
+              <label for="ime">Ime</label>
+              <input type="text" id="ime" name="ime" placeholder="Janez" autocomplete="given-name" />
+            </div>
+            <div class="field">
+              <label for="priimek">Priimek</label>
+              <input type="text" id="priimek" name="priimek" placeholder="Novak" autocomplete="family-name" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="email">E-naslov</label>
+            <input type="email" id="email" name="email" placeholder="janez@primer.si" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="checkboxes">
+          <label class="checkbox-row">
+            <input type="checkbox" id="pravila" />
+            <span class="checkbox-label">
+              Strinjam se s <a href="#">pravili</a> nagradne igre "Napovej rezultat" in politiko zasebnosti NK Celje.
+            </span>
+          </label>
+          <label class="checkbox-row">
+            <input type="checkbox" id="novice" />
+            <span class="checkbox-label">
+              Dovoljujem, da NK Celje uporabi moj kontakt za občasno pošiljanje klubskih novic, nagradnih iger in posebnih ponudb za navijače.
+            </span>
+          </label>
+        </div>
+
+        <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+          Oddaj svojo napoved
+        </button>
+
+        <p class="once-note">Rezultat tekme lahko napoveste samo enkrat.</p>
+      </div>
+
+      <!-- SUCCESS STATE -->
+      <div class="success-state" id="successState">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="success-title">Napoved oddana!</div>
+        <div class="success-desc">Hvala za sodelovanje. Srečno pri žrebu! 🎉</div>
+      </div>
+
+      <!-- SPONSOR (inline, above GDPR) -->
+      <div class="sponsor-inline">
+        <p class="sponsor-label">Sponzor nagradne igre</p>
+        <div class="sponsor-card">
+          <a href="#" target="_blank" rel="noopener">
+          <img src="sponzor.png" alt="Sponzor" class="sponsor-img" />
+        </a>
+        </div>
+      </div>
+
+      <!-- GDPR NOTE -->
+      <p class="gdpr-note">
+        Z oddajo obrazca potrjujem, da sem seznanjen z obdelavo osebnih podatkov za namen izvedbe nagradne igre. Upravljavec osebnih podatkov je NK Celje.
+        Obdelavo za potrebe delovanja sistema za upravljanje kontaktov in tehnične podpore izvaja pogodbeni obdelovalec.
+        <a href="#">Politika zasebnosti</a>
+      </p>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="hub-footer">
+      <a href="#">Pravila nagradne igre</a>
+      <span>·</span>
+      <a href="#">Politika zasebnosti</a>
+      <span>·</span>
+      <a href="#">Politika piškotkov</a>
+    </footer>
+
+  </main>
+
+  <script>
+    const scores = { home: 0, away: 0 };
+
+    function change(side, delta) {
+      scores[side] = Math.max(0, Math.min(20, scores[side] + delta));
+      document.getElementById(side + 'Score').textContent = scores[side];
+    }
+
+    function submitForm() {
+      const ime    = document.getElementById('ime').value.trim();
+      const priimek = document.getElementById('priimek').value.trim();
+      const email  = document.getElementById('email').value.trim();
+      const pravila = document.getElementById('pravila').checked;
+
+      if (!ime || !priimek || !email || !pravila) {
+        // Simple shake on missing fields
+        const btn = document.getElementById('submitBtn');
+        btn.style.animation = 'none';
+        btn.offsetHeight; // reflow
+        btn.style.animation = 'shake 0.35s ease';
+        return;
+      }
+
+      document.getElementById('formContent').style.display = 'none';
+      const success = document.getElementById('successState');
+      success.style.display = 'flex';
+      success.style.animation = 'fadeUp 0.4s ease both';
+    }
+
+    // Shake animation
+    const s = document.createElement('style');
+    s.textContent = `
+      @keyframes shake {
+        0%,100% { transform: translateX(0); }
+        20% { transform: translateX(-6px); }
+        40% { transform: translateX(6px); }
+        60% { transform: translateX(-4px); }
+        80% { transform: translateX(4px); }
+      }
+      @keyframes rippleAnim { to { transform: scale(1); opacity: 0; } }
+    `;
+    document.head.appendChild(s);
+  </script>
+</body>
+</html>
